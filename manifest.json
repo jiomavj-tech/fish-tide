@@ -1,17 +1,33 @@
 {
-  "name": "Pesca Kids Floripa",
-  "short_name": "Pesca Kids",
-  "description": "App educativo de pesca para crianças em Florianópolis — água salgada e água doce, com Pescômetro, provas e receitas.",
-  "start_url": "./index.html",
+  "name": "Fish & Tide — pescaria da Ilha",
+  "short_name": "Fish & Tide",
+  "description": "Maré, lua, vento e os pesqueiros de Florianópolis, para crianças aprenderem a pescar.",
+  "start_url": "./",
   "scope": "./",
   "display": "standalone",
-  "orientation": "portrait-primary",
+  "orientation": "portrait",
   "background_color": "#F2FAFC",
   "theme_color": "#118AB2",
   "lang": "pt-BR",
+  "categories": ["education", "lifestyle"],
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
-    { "src": "icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+    {
+      "src": "icone-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icone-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "icone-mask-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
   ]
 }
