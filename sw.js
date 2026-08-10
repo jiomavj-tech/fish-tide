@@ -15,6 +15,7 @@
  */
 
 const VERSAO = "fish-tide-v1";
+const CACHE_TILES = "fish-tide-tiles-v1";
 const ESSENCIAIS = [
   "./",
   "./index.html",
@@ -34,7 +35,7 @@ self.addEventListener("install", (ev) => {
 self.addEventListener("activate", (ev) => {
   ev.waitUntil(
     caches.keys()
-      .then((nomes) => Promise.all(nomes.filter((n) => n !== VERSAO).map((n) => caches.delete(n))))
+      .then((nomes) => Promise.all(nomes.filter((n) => n !== VERSAO && n !== CACHE_TILES).map((n) => caches.delete(n))))
       .then(() => self.clients.claim())
   );
 });
@@ -42,10 +43,31 @@ self.addEventListener("activate", (ev) => {
 self.addEventListener("fetch", (ev) => {
   const req = ev.request;
 
-  // Só cuidamos do que é nosso e de leitura. Previsão do tempo, mapa e Firebase
-  // passam direto pra rede: são dados que precisam estar frescos.
   if (req.method !== "GET") return;
   const url = new URL(req.url);
+
+  // Tiles do mapa (OpenStreetMap): são imagens que quase não mudam, então guardamos
+  // pra funcionar na praia sem sinal. Mostra o que já foi visto antes na hora, e
+  // atualiza o cache em segundo plano quando tem rede — sem atrasar o mapa.
+  if (url.hostname === "tile.openstreetmap.org") {
+    ev.respondWith(
+      caches.open(CACHE_TILES).then((c) =>
+        c.match(req).then((cacheado) => {
+          const buscaNova = fetch(req)
+            .then((resp) => {
+              if (resp && resp.ok) c.put(req, resp.clone());
+              return resp;
+            })
+            .catch(() => null);
+          return cacheado || buscaNova;
+        })
+      )
+    );
+    return;
+  }
+
+  // Só cuidamos do que é nosso e de leitura, além dos tiles acima. Previsão do
+  // tempo e Firebase passam direto pra rede: são dados que precisam estar frescos.
   if (url.origin !== self.location.origin) return;
 
   ev.respondWith(
