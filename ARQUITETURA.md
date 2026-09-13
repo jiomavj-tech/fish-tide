@@ -42,10 +42,17 @@ dos pôsteres da série "Peixes de Florianópolis". O nome do arquivo é o `id` 
 ficha em `ftPeixesFloripa`, então a ficha monta o caminho sozinha
 (`"peixes/"+peixe.id+".webp"`).
 
-Na aba Iscas o mapa `ftFotoPeixe` liga o `id` de `ge` ao arquivo, e **só entra
-quem casa no nome científico** com o mapa `Nh`. Peixe marcado `incerto` em `Nh`
-(carapeba, xerelete, cocoróca, baiacu, cação) fica de fora de propósito: o app
-se recusa a cravar a espécie, e uma foto cravaria pela imagem.
+Na aba Iscas há dois caminhos, e a diferença entre eles importa:
+
+- `ftFotoPeixe` liga o `id` de `ge` a **uma** foto, e só entra quem casa no nome
+  científico com o mapa `Nh`. São 10 espécies.
+- `ftFotoSci` liga **nome científico** a arquivo, e serve o bloco de nome
+  ambíguo: cada candidato de um `Nh[x].incerto` ganha a sua miniatura. Assim a
+  criança compara as espécies em vez de só ler dois nomes em latim.
+
+Peixe marcado `incerto` **nunca** recebe foto única — seria cravar a espécie
+pela imagem, justo onde o app diz que não crava. O papa-terra é o caso completo:
+os dois candidatos têm foto e aparecem lado a lado.
 
 Duas armadilhas:
 
