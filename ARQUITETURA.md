@@ -12,15 +12,15 @@ carregando 493 KB de React sem necessidade.
 
 | linhas | região | bytes | % |
 |---|---|---:|---:|
-| 1–15 | `<head>`, meta tags e um `<style>` de 309 bytes | 1.218 | 0,2% |
-| 17–35 | script: registro do service worker | 792 | 0,1% |
-| 36–52 | script: tratador de erro que mostra a falha na tela | 1.133 | 0,2% |
-| 53–63 | `<div id="root">` e o shim `window.storage` (localStorage) | 649 | 0,1% |
-| 65–73 | **bundle: React, ReactDOM, scheduler, Leaflet, Firebase** | 492.999 | 71,9% |
-| **74** | **bundle: o código do app** | 187.964 | 27,4% |
-| 75+ | comentários de licença das bibliotecas | 1.203 | 0,2% |
+| 1–15 | `<head>`, meta tags e um `<style>` de 309 bytes | 1.233 | 0,2% |
+| 17–35 | script: registro do service worker | 811 | 0,1% |
+| 36–52 | script: tratador de erro que mostra a falha na tela | 1.150 | 0,1% |
+| 53–63 | `<div id="root">` e o shim `window.storage` (localStorage) | 660 | 0,1% |
+| 65–73 | **bundle: React, ReactDOM, scheduler, Leaflet, Firebase** | 493.008 | 62,7% |
+| **74** | **bundle: o código do app** | 288.704 | 36,7% |
+| 75+ | comentários de licença das bibliotecas | 1.253 | 0,2% |
 
-Ou seja: **99,3% do arquivo é build**, e o código do app inteiro vive numa
+Ou seja: **99,4% do arquivo é build**, e o código do app inteiro vive numa
 **única linha, a 74**.
 
 ## A regra prática
@@ -29,11 +29,18 @@ Ou seja: **99,3% do arquivo é build**, e o código do app inteiro vive numa
 de terceiros e nunca precisam ser carregadas.
 
 ```bash
-sed -n '74p' index.html > /tmp/app.js     # 188 KB em vez de 686 KB
+sed -n '74p' index.html > /tmp/app.js     # 289 KB em vez de 787 KB
 ```
 
 Alguns trechos de componentes ficam no fim da linha 73 (`T`, `W`, `Ba`, `da`,
 `Ki`, `fe`, `Xi`, `Ha`, `Xd`) — quando o alvo não estiver na 74, procure na 73.
+
+Nem tudo na linha 74 é minificado. O conteúdo acrescentado depois do build entra
+como bloco legível, com nome de verdade e ancorado logo antes de `var Xv=[` (a
+lista de abas): `ftProModulos` (trilha da aba Pro), `ftPeixesZonas` +
+`ftPeixesFloripa` + `ftFichaPeixe` + `ftPeixesTab` (as fichas de espécie). Para
+acrescentar uma espécie, basta mais um objeto em `ftPeixesFloripa` — a contagem
+("37 peixes"), a barra de progresso e os filtros saem do tamanho da lista.
 
 ## Editando com segurança
 
