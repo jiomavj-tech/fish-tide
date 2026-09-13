@@ -35,6 +35,35 @@ sed -n '74p' index.html > /tmp/app.js     # 289 KB em vez de 787 KB
 Alguns trechos de componentes ficam no fim da linha 73 (`T`, `W`, `Ba`, `da`,
 `Ki`, `fe`, `Xi`, `Ha`, `Xd`) — quando o alvo não estiver na 74, procure na 73.
 
+## As fotos dos peixes
+
+`peixes/` guarda 37 arquivos `.webp` (1,4 MB no total, ~38 KB cada), recortados
+dos pôsteres da série "Peixes de Florianópolis". O nome do arquivo é o `id` da
+ficha em `ftPeixesFloripa`, então a ficha monta o caminho sozinha
+(`"peixes/"+peixe.id+".webp"`).
+
+Na aba Iscas há dois caminhos, e a diferença entre eles importa:
+
+- `ftFotoPeixe` liga o `id` de `ge` a **uma** foto, e só entra quem casa no nome
+  científico com o mapa `Nh`. São 10 espécies.
+- `ftFotoSci` liga **nome científico** a arquivo, e serve o bloco de nome
+  ambíguo: cada candidato de um `Nh[x].incerto` ganha a sua miniatura. Assim a
+  criança compara as espécies em vez de só ler dois nomes em latim.
+
+Peixe marcado `incerto` **nunca** recebe foto única — seria cravar a espécie
+pela imagem, justo onde o app diz que não crava. O papa-terra é o caso completo:
+os dois candidatos têm foto e aparecem lado a lado.
+
+Duas armadilhas:
+
+- **`loading:"lazy"` só funciona com altura conhecida.** Numa imagem
+  `width:100%;height:auto` a caixa nasce com 0 de altura, o observador nunca
+  dispara e o navegador **não chega a pedir o arquivo**. Por isso o lazy está só
+  nas miniaturas da lista, que têm largura e altura fixas.
+- O service worker **não** precisa listar as fotos: o `fetch` dele já guarda
+  qualquer arquivo da própria origem no primeiro acesso. Pôr as 37 em
+  `ESSENCIAIS` só deixaria a instalação mais lenta.
+
 Nem tudo na linha 74 é minificado. O conteúdo acrescentado depois do build entra
 como bloco legível, com nome de verdade e ancorado logo antes de `var Xv=[` (a
 lista de abas): `ftProModulos` (trilha da aba Pro), `ftPeixesZonas` +
