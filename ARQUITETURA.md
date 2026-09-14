@@ -50,9 +50,20 @@ Na aba Iscas há dois caminhos, e a diferença entre eles importa:
   ambíguo: cada candidato de um `Nh[x].incerto` ganha a sua miniatura. Assim a
   criança compara as espécies em vez de só ler dois nomes em latim.
 
+- `ftFotoGrupo` liga o `id` de `ge` a um desenho que vale para **o grupo**, não
+  para uma espécie. Vem das pranchas de série, que desenham um peixe e listam
+  duas ou três espécies embaixo. Aparece no lugar da foto única, com uma legenda
+  dizendo que serve para o grupo todo.
+
 Peixe marcado `incerto` **nunca** recebe foto única — seria cravar a espécie
-pela imagem, justo onde o app diz que não crava. O papa-terra é o caso completo:
-os dois candidatos têm foto e aparecem lado a lado.
+pela imagem, justo onde o app diz que não crava. Pode receber foto de grupo
+(legendada) e foto por candidato. O papa-terra e o badejo são os casos
+completos: os dois candidatos têm foto e aparecem lado a lado.
+
+Fonte das imagens: 37 vêm de pôster individual (recorte de ~1060 px, saída com
+640) e 10 vêm da prancha "Série 4", que empacota dez peixes numa folha só — daí
+saem em 295 px, no tamanho nativo. São visivelmente menos nítidas; se um dia
+vier o pôster individual de alguma delas, é só trocar o arquivo.
 
 Duas armadilhas:
 
