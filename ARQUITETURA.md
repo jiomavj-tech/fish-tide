@@ -118,6 +118,25 @@ Exceção: existe um bloco `<style>` injetado pelo app com as animações
 Regra de folha de estilo **não** vence `style` inline — para mudar quem declara
 inline, é preciso alterar o inline.
 
+## Dia de chuva
+
+`ftExperimentos` (linha 74) tem 8 experimentos de ciência, com `ftExpFicha` e
+`ftChuvaTab`. Aparecem em dois lugares:
+
+- seção **Dia de chuva** na aba Aprender;
+- card na aba **Planejar** quando `Zx(dia)==="ruim"` — o mesmo critério que o app
+  já usava (chuva ≥ 70%, vento ≥ 40 km/h ou onda ≥ 1,8 m).
+
+O botão do card faz `ftSecoesAbertas.chuva=!0` **antes** de chamar `ia()`
+(`irParaAprender`): `ftSecao` lê esse objeto na montagem, então a aba Aprender já
+abre com a seção aberta. É o jeito de navegar para uma seção específica.
+
+O texto dos experimentos foi escrito para este app — os fenômenos são
+demonstrações clássicas (densidade, empuxo, tensão superficial, ponto de
+congelamento), e cada um é amarrado a algo que a criança vê pescando. O livro que
+deu a ideia é creditado dentro da própria seção. **Não copie texto de material de
+terceiros para cá**: o app é publicado.
+
 ## Verificando de verdade
 
 Não existe suíte de testes. O que existe é o app: ele roda em `file://` sem
