@@ -137,6 +137,24 @@ congelamento), e cada um é amarrado a algo que a criança vê pescando. O livro
 deu a ideia é creditado dentro da própria seção. **Não copie texto de material de
 terceiros para cá**: o app é publicado.
 
+## Porta de entrada
+
+`ftPrimeirosPassos` (linha 74) é o card do topo da aba Planejar, com três
+passos para a primeira sessão. Some sozinho quando os três saem.
+
+Os três são medidos por estado que o app **já guardava** — nenhum contador
+novo: `fichasPeixes` (conheceu um peixe), `iscas` (marcou o que tem na caixa),
+`locais` (salvou um pesqueiro). O único campo criado é `inicioFeito`, e só para
+o usuário poder fechar o card de parabéns.
+
+Os passos navegam com `ftSecoesAbertas.<id>=!0` antes de `irPara(aba)`, o mesmo
+truque do card de dia de chuva. É o que faz o passo cair na seção certa —
+`peixesfloripa` na aba Aprender e `sugestoes` na aba Locais. Sem isso o passo 3
+cai numa aba onde a lista de pesqueiros está fechada, e a pessoa não acha.
+
+`Nv` ganhou a prop `irPara`, navegação genérica que o roteador injeta como
+`na=>e(na)`.
+
 ## Verificando de verdade
 
 Não existe suíte de testes. O que existe é o app: ele roda em `file://` sem
