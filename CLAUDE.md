@@ -23,8 +23,12 @@ Em resumo, o que o `ARQUITETURA.md` detalha:
 - edite por **substituição de string exata**, ancorada num trecho que aparece
   **exatamente uma vez**;
 - confira que o saldo de parênteses e chaves não mudou;
-- **rode `node --check`** sobre as linhas 65–74 extraídas. Passo obrigatório: o
-  saldo de parênteses não pega erro de aspas.
+- **rode `node --check`** sobre as linhas **65 a 379** extraídas. Passo
+  obrigatório: o saldo de parênteses não pega erro de aspas.
+
+O módulo da maré (`ftMare*`) já não cabe na linha 74 — é bloco legível com
+quebras de linha, da 75 à 379. Por isso o `node --check` vai até a 379, e não
+até a 74 como era antes.
 
 Conteúdo acrescentado depois do build entra como **bloco legível, com nome de
 verdade**, ancorado logo antes de `var Xv=[` (a lista de abas). É assim que estão
@@ -41,18 +45,27 @@ Não há suíte de testes. O que vale é abrir o app no Chromium via Playwright 
 conferir de verdade antes de commitar:
 
 ```bash
-npx --no-install http-server -p 8899 -s .
+python3 -m http.server 8899 --bind 127.0.0.1
 ```
+
+(`npx --no-install http-server` **não** funciona: o pacote não está instalado e
+o `npx` não tem como baixar.)
 
 Use `http://127.0.0.1:8899`, **não `file://`** — o onboarding depende de
 `localStorage`, que não funciona direito em `file://`.
 
-Para passar do onboarding: clicar em "Só experimentar, sem conta", preencher o
-campo `input[placeholder="Seu nome"]`, escolher uma idade e clicar em "Começar!".
-Sem o nome, o botão não avança.
+Para passar do onboarding: clicar em **"Começar"**, preencher o campo
+`input[placeholder="Seu nome"]`, escolher uma idade e clicar em **"Começar! 🐟"**.
+Sem o nome, o botão não avança. Sem internet, a primeira tela mostra só
+"Começar" — o botão "Só experimentar, sem conta" não aparece.
+
+**Escolha 18+ se for conferir a maré, o painel técnico ou qualquer coisa de
+adulto** — com idade de criança o app abre no modo guiado e esses cards ficam
+escondidos atrás da seção de detalhes.
 
 ```js
-chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' })
+const { chromium } = require('playwright');
+await chromium.launch();   // sem executablePath: a versão do pacote muda sozinha
 ```
 
 Meça, não só olhe: erros de console, ausência de scroll horizontal a 390px **e a

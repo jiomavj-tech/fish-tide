@@ -17,23 +17,39 @@ carregando 493 KB de React sem necessidade.
 | 36–52 | script: tratador de erro que mostra a falha na tela | 1.150 | 0,1% |
 | 53–63 | `<div id="root">` e o shim `window.storage` (localStorage) | 660 | 0,1% |
 | 65–73 | **bundle: React, ReactDOM, scheduler, Leaflet, Firebase** | 493.008 | 62,7% |
-| **74** | **bundle: o código do app** | 288.704 | 36,7% |
-| 75+ | comentários de licença das bibliotecas | 1.253 | 0,2% |
+| **74** | **bundle: o código do app**, minificado | ~282.000 | 34% |
+| 75–379 | **módulo da maré**, acrescentado depois do build, legível | ~30.000 | 3,6% |
+| 380+ | comentários de licença das bibliotecas | 1.253 | 0,2% |
 
-Ou seja: **99,4% do arquivo é build**, e o código do app inteiro vive numa
-**única linha, a 74**.
+Ou seja: quase tudo é build, e o código minificado do app vive numa **única
+linha, a 74**.
 
 ## A regra prática
 
-**Para mexer no app, leia e edite só a linha 74.** As linhas 65–73 são bibliotecas
-de terceiros e nunca precisam ser carregadas.
+**Para mexer no app minificado, leia e edite só a linha 74.** As linhas 65–73
+são bibliotecas de terceiros e nunca precisam ser carregadas.
 
 ```bash
-sed -n '74p' index.html > /tmp/app.js     # 289 KB em vez de 787 KB
+sed -n '74p' index.html > /tmp/app.js     # ~282 KB em vez de 813 KB
 ```
 
 Alguns trechos de componentes ficam no fim da linha 73 (`T`, `W`, `Ba`, `da`,
-`Ki`, `fe`, `Xi`, `Ha`, `Xd`) — quando o alvo não estiver na 74, procure na 73.
+`Ki`, `fe`, `Xi`, `Ha`, `Xd`, `n0`, `iv`, `tv`) — quando o alvo não estiver na
+74, procure na 73.
+
+**Atenção: nem todo o app cabe mais na linha 74.** O módulo da maré
+(`ftMare*`) entrou como bloco legível de verdade, com quebras de linha, e por
+isso ocupa da 75 à 379. Qualquer `node --check` tem que cobrir **65 até 379**,
+não só até a 74:
+
+```bash
+sed -n '65,379p' index.html > /tmp/check.js && node --check /tmp/check.js
+```
+
+Esse bloco está fisicamente *depois* da linha 74, mas isso não é problema:
+`var` e `function` sofrem hoist dentro do mesmo escopo do bundle, então `n0`
+(linha 73) chama `ftMareDia` (linha ~330) sem susto — a chamada só acontece
+em tempo de render, muito depois de tudo ter sido avaliado.
 
 ## As fotos dos peixes
 
@@ -118,6 +134,52 @@ Exceção: existe um bloco `<style>` injetado pelo app com as animações
 Regra de folha de estilo **não** vence `style` inline — para mudar quem declara
 inline, é preciso alterar o inline.
 
+## A maré
+
+Esta é a parte do app que mais pode mentir, então vale ler com calma.
+
+**De onde vem o número.** Tábua oficial da Marinha do Brasil (CHM), estação
+**PORTO DE FLORIANÓPOLIS**, 27°35'.3 S / 48°33'.4 W, fuso UTC−3, nível médio
+0,64 m, carta 1902. O ano de **2026 inteiro** está embutido em
+`ftMareTabela2026`: 365 dias, 1.959 marés, verbatim, 19 KB. Erro zero e
+funciona sem internet.
+
+**Fora de 2026 o app calcula.** `ftMareNivel` soma 57 componentes harmônicas
+(`ftMareComp`) com correção nodal, e `ftMareCalc` varre o dia de 2 em 2
+minutos procurando os extremos. As constantes foram ajustadas por mínimos
+quadrados sobre as próprias 1.959 marés oficiais, com a condição de derivada
+nula em cada extremo.
+
+**Quanto a conta erra**, medida contra a tábua oficial de 2026: **13,4 min de
+erro médio** no horário (p95 = 35 min, pior caso 89 min) e **2,2 cm** na
+altura. Num teste de generalização — ajustar só com jan–jun e prever jul–dez —
+o erro sobe pouco, para 15,4 min. Ou seja: serve de rede de segurança, não
+substitui a tábua. `ftMareCredito` diz na tela qual dos dois está valendo.
+
+Sinal de que o ajuste fechou: o nível médio saiu em **0,646 m** sozinho, e a
+tábua da Marinha declara **0,64 m**. Esse número nunca entrou no ajuste.
+
+**O formato tem uma decisão de projeto dentro.** Cada maré é `"HHMMhhh"`, com
+`hhh = (altura_em_m + 0,5) × 100`. Repare no que **não** está guardado: se a
+maré é alta ou baixa. `ftMareTipar` deduz isso alternando a partir de um par
+de alturas diferentes.
+
+Isso é de propósito. A tabela anterior guardava o tipo numa letra (`A`/`B`) e,
+em **30 dos 184 dias**, tinha duas altas ou duas baixas seguidas — coisa que
+no mar não existe. Deduzindo o tipo das alturas, esse estado impossível não
+tem como ser escrito. Ancorar num par de alturas **diferentes** também importa:
+a tábua da Marinha tem dias com dois extremos de mesma altura, e comparar só
+com o vizinho quebraria ali.
+
+**Quando sair a tábua de 2027:** baixe o PDF da estação, gere a tabela nova e
+troque `ftMareTabela2026` e `ftMareAnoTabela`. Nada mais muda.
+<https://www.marinha.mil.br/chm/tabuas-de-mare-6>
+
+**Cuidado ao mexer na fase.** `ftMareNivel` usa `cos(V + u + g)`. O `g`
+guardado é o negativo da defasagem convencional, porque veio de
+`atan2(−B, A)`. Trocar esse sinal não quebra o `node --check` e não derruba a
+tela — só faz a maré ficar errada em meia hora. Já aconteceu uma vez.
+
 ## Dia de chuva
 
 `ftExperimentos` (linha 74) tem 8 experimentos de ciência, com `ftExpFicha` e
@@ -157,17 +219,32 @@ cai numa aba onde a lista de pesqueiros está fechada, e a pessoa não acha.
 
 ## Verificando de verdade
 
-Não existe suíte de testes. O que existe é o app: ele roda em `file://` sem
-servidor. Use Chromium via Playwright para conferir mudança visual e de
-comportamento antes de commitar.
+Não existe suíte de testes. O que existe é o app. Use Chromium via Playwright
+para conferir mudança visual e de comportamento antes de commitar.
+
+**Não fixe o caminho do Chromium.** A versão do pacote muda sozinha e o
+caminho antigo some (já saiu de `chromium-1194` para `chromium-1243`, com o
+diretório interno mudando de `chrome-linux` para `chrome-linux64`). Deixe o
+Playwright achar:
 
 ```js
-// PLAYWRIGHT_BROWSERS_PATH já aponta para /opt/pw-browsers
-chromium.launch({ executablePath: '/opt/pw-browsers/chromium-1194/chrome-linux/chrome' })
+const { chromium } = require('playwright');
+await chromium.launch();     // sem executablePath
 ```
 
-Vale medir, não só olhar: altura de área de toque, tamanho de fonte, altura de
-rolagem por aba e ausência de scroll horizontal em 320px.
+**O servidor local:** `npx --no-install http-server` falha, o pacote não está
+instalado e o `npx` não pode baixar. Use o que já existe:
+
+```bash
+python3 -m http.server 8899 --bind 127.0.0.1
+```
+
+Vale medir, não só olhar: erros de console, altura de área de toque, tamanho de
+fonte, altura de rolagem por aba e ausência de scroll horizontal em 320px.
+
+**O card da maré não aparece no modo guiado.** Ele mora na seção de detalhes
+do painel. Para vê-lo no teste, escolha idade **18+** no onboarding — senão o
+teste passa sem ter olhado para nada.
 
 ## Publicação
 
