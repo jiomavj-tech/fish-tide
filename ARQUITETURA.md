@@ -180,6 +180,45 @@ guardado é o negativo da defasagem convencional, porque veio de
 `atan2(−B, A)`. Trocar esse sinal não quebra o `node --check` e não derruba a
 tela — só faz a maré ficar errada em meia hora. Já aconteceu uma vez.
 
+## Uma pescaria, vários equipamentos
+
+O diário guarda **um registro por equipamento**. Quem sai de casa uma vez e
+pesca com molinete e com coca grava dois registros: mesma data, mesmo local,
+materiais diferentes. O modelo de dados sempre aceitou isso — o que faltava
+era a tela mostrar os dois como uma pescaria só, e a estatística parar de
+contar duas saídas onde houve uma.
+
+A chave de uma pescaria é `data + local` (`ftChavePescaria`). Não é um id
+próprio **de propósito**: assim os registros gravados antes desta mudança se
+agrupam sozinhos, sem migração nenhuma.
+
+`ftAgrupaPescarias` monta os grupos para a tela e `ftIdas` conta as saídas
+de verdade.
+
+**A armadilha, e ela é silenciosa.** Qualquer contagem de "pescarias" tem de
+usar `ftIdas(registros)`, nunca `registros.length` — senão anotar o segundo
+equipamento do dia derruba a média pela metade e infla o nível em dobro.
+Quatro lugares dependiam disso e foram corrigidos:
+
+| onde | contava | passou a contar |
+|---|---|---|
+| `Xn` (peixes por ida) | um registro = uma ida | saídas distintas |
+| `tr` nível "Pescador de Verdade" | `a.length` | `ftIdas(a)` |
+| medalha "Registre 5 pescarias" | `a.length>=5` | `ftIdas(a)>=5` |
+| resumo "N pescarias" (Conquistas) | `o.length` | `ftIdas(o)` |
+
+Nada disso quebra o `node --check` nem derruba a tela: erra quieto, só no
+número. Ao mexer em estatística do diário, confira esta lista.
+
+**Dois defeitos conhecidos no formulário**, nenhum deles tocado aqui:
+
+- o seletor de equipamento reaproveita `$i`, que é a lista de **módulos de
+  aprendizado**. Por isso ele oferece "História da Pesca da Ilha" e
+  "Pesque-pague: regras e dicas" como equipamentos. Trocar a lista exige
+  cuidado: os registros antigos guardam esses ids;
+- o campo "tamanho do maior" aparece **antes** de "quantos peixes", o que
+  inverte a ordem natural de quem está preenchendo.
+
 ## Dia de chuva
 
 `ftExperimentos` (linha 74) tem 8 experimentos de ciência, com `ftExpFicha` e
